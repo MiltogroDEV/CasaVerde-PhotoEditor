@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa Verde - Editor de Fotos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div id="logoBox">
+            <img id="logo" src="assets/logo/logo.png" alt="">
+        </div>
+
+        <img src="assets/plants/plant1.png" class="plant" />
+        <img src="assets/plants/plant2.png" class="plant" />
+        <img src="assets/plants/plant3.png" class="plant" />
+    </div>
+    
+    <div class="editor">
+        <input type="file" id="upload" accept="image/*" />
+        <canvas id="canvas"></canvas>
+        <button id="download">Baixar Imagem</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
