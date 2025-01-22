@@ -2,12 +2,12 @@
 const uploadInput = document.getElementById('upload');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const plantImages = document.querySelectorAll('.plant');
+const itensImages = document.querySelectorAll('.item');
 const downloadButton = document.getElementById('download');
 
 // Variáveis para controle de edição
 let uploadedImage = null;
-let plants = []; // Lista para rastrear as plantas adicionadas
+let itens = []; // Lista para rastrear as itens adicionadas
 let uploadedFileName = '';
 const MAX_SIZE = 750;
 
@@ -51,17 +51,17 @@ uploadInput.addEventListener('change', (event) => {
   }
 });
 
-// Adicionar plantas ao canvas
-plantImages.forEach((plantImg) => {
-  plantImg.addEventListener('click', () => {
+// Adicionar itens ao canvas
+itensImages.forEach((itemImg) => {
+  itemImg.addEventListener('click', () => {
     const img = new Image();
-    img.src = plantImg.src;
+    img.src = itemImg.src;
     img.onload = () => {
-      // Calcular tamanho inicial da planta como 10% da largura da imagem de fundo
+      // Calcular tamanho inicial da itema como 10% da largura da imagem de fundo
       const initialWidth = uploadedImage ? uploadedImage.width * 0.1 : 80;
       const initialHeight = (img.height / img.width) * initialWidth;
 
-      const plant = {
+      const item = {
         image: img,
         x: 50,
         y: 50,
@@ -71,7 +71,7 @@ plantImages.forEach((plantImg) => {
         isResizing: false,
         showButtons: false
       };
-      plants.push(plant);
+      itens.push(item);
       drawCanvas();
     };
   });
@@ -87,67 +87,67 @@ function drawCanvas() {
     ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
   }
 
-  // Desenhar plantas
-  plants.forEach((plant) => {
-    ctx.drawImage(plant.image, plant.x, plant.y, plant.width, plant.height);
+  // Desenhar itens
+  itens.forEach((item) => {
+    ctx.drawImage(item.image, item.x, item.y, item.width, item.height);
 
-    if (plant.showButtons) {
+    if (item.showButtons) {
       // Desenhar botão de remoção
       ctx.fillStyle = 'red';
       ctx.beginPath();
-      ctx.arc(plant.x + plant.width - 10, plant.y + 10, 10, 0, Math.PI * 2);
+      ctx.arc(item.x + item.width - 10, item.y + 10, 10, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = 'white';
       ctx.font = '12px Arial';
-      ctx.fillText('X', plant.x + plant.width - 14, plant.y + 14);
+      ctx.fillText('X', item.x + item.width - 14, item.y + 14);
 
       // Desenhar botão de redimensionamento
       ctx.fillStyle = 'blue';
       ctx.beginPath();
-      ctx.arc(plant.x + plant.width - 10, plant.y + plant.height - 10, 10, 0, Math.PI * 2);
+      ctx.arc(item.x + item.width - 10, item.y + item.height - 10, 10, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = 'white';
       ctx.font = '12px Arial';
-      ctx.fillText('✎', plant.x + plant.width - 16, plant.y + plant.height - 6);
+      ctx.fillText('✎', item.x + item.width - 16, item.y + item.height - 6);
     }
   });
 }
 
-// Eventos de arrastar, redimensionar e remover plantas
-let selectedPlant = null;
+// Eventos de arrastar, redimensionar e remover itens
+let selecteditem = null;
 let offsetX, offsetY;
 let isResizing = false;
 
 canvas.addEventListener('mousedown', (event) => {
   const { offsetX: mouseX, offsetY: mouseY } = event;
-  selectedPlant = plants.find(
-    (plant) =>
-      mouseX >= plant.x &&
-      mouseX <= plant.x + plant.width &&
-      mouseY >= plant.y &&
-      mouseY <= plant.y + plant.height
+  selecteditem = itens.find(
+    (item) =>
+      mouseX >= item.x &&
+      mouseX <= item.x + item.width &&
+      mouseY >= item.y &&
+      mouseY <= item.y + item.height
   );
 
-  if (selectedPlant) {
-    selectedPlant.showButtons = true;
+  if (selecteditem) {
+    selecteditem.showButtons = true;
 
     // Verificar se clicou no botão de remoção
-    const removeX = selectedPlant.x + selectedPlant.width - 10;
-    const removeY = selectedPlant.y + 10;
+    const removeX = selecteditem.x + selecteditem.width - 10;
+    const removeY = selecteditem.y + 10;
     const distance = Math.sqrt(
       Math.pow(mouseX - removeX, 2) + Math.pow(mouseY - removeY, 2)
     );
 
     if (distance <= 10) {
-      plants = plants.filter((plant) => plant !== selectedPlant);
-      selectedPlant = null;
+      itens = itens.filter((item) => item !== selecteditem);
+      selecteditem = null;
       drawCanvas();
       return;
     }
 
     // Verificar se clicou no botão de redimensionamento
-    const resizeX = selectedPlant.x + selectedPlant.width - 10;
-    const resizeY = selectedPlant.y + selectedPlant.height - 10;
+    const resizeX = selecteditem.x + selecteditem.width - 10;
+    const resizeY = selecteditem.y + selecteditem.height - 10;
     const resizeDistance = Math.sqrt(
       Math.pow(mouseX - resizeX, 2) + Math.pow(mouseY - resizeY, 2)
     );
@@ -155,27 +155,27 @@ canvas.addEventListener('mousedown', (event) => {
     if (resizeDistance <= 10) {
       isResizing = true;
     } else {
-      offsetX = mouseX - selectedPlant.x;
-      offsetY = mouseY - selectedPlant.y;
-      selectedPlant.isDragging = true;
+      offsetX = mouseX - selecteditem.x;
+      offsetY = mouseY - selecteditem.y;
+      selecteditem.isDragging = true;
     }
   } else {
-    plants.forEach((plant) => (plant.showButtons = false));
+    itens.forEach((item) => (item.showButtons = false));
   }
 
   drawCanvas();
 });
 
 canvas.addEventListener('mousemove', (event) => {
-  if (selectedPlant) {
+  if (selecteditem) {
     const { offsetX: mouseX, offsetY: mouseY } = event;
 
     if (isResizing) {
-      selectedPlant.width = Math.max(mouseX - selectedPlant.x, 20); // Largura mínima de 20px
-      selectedPlant.height = Math.max(mouseY - selectedPlant.y, 20); // Altura mínima de 20px
-    } else if (selectedPlant.isDragging) {
-      selectedPlant.x = mouseX - offsetX;
-      selectedPlant.y = mouseY - offsetY;
+      selecteditem.width = Math.max(mouseX - selecteditem.x, 20); // Largura mínima de 20px
+      selecteditem.height = Math.max(mouseY - selecteditem.y, 20); // Altura mínima de 20px
+    } else if (selecteditem.isDragging) {
+      selecteditem.x = mouseX - offsetX;
+      selecteditem.y = mouseY - offsetY;
     }
 
     drawCanvas();
@@ -183,18 +183,18 @@ canvas.addEventListener('mousemove', (event) => {
 });
 
 canvas.addEventListener('mouseup', () => {
-  if (selectedPlant) {
-    selectedPlant.isDragging = false;
+  if (selecteditem) {
+    selecteditem.isDragging = false;
     isResizing = false;
-    selectedPlant = null;
+    selecteditem = null;
   }
 });
 
 canvas.addEventListener('mouseleave', () => {
-  if (selectedPlant) {
-    selectedPlant.isDragging = false;
+  if (selecteditem) {
+    selecteditem.isDragging = false;
     isResizing = false;
-    selectedPlant = null;
+    selecteditem = null;
   }
 });
 
